@@ -1,0 +1,8 @@
+{
+  "name": "LinkNote Studio",
+  "description": "An advanced client-side notepad with IndexedDB storage, markdown preview, Web Crypto encryption, and URL-based note sharing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

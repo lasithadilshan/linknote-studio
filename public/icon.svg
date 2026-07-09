@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a5b4fc" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with smooth rounded corner -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  
+  <!-- External glow or border -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="rgba(99, 102, 241, 0.15)" stroke-width="8" />
+
+  <!-- The Document/Note Base -->
+  <path d="M140 120 C140 100, 160 90, 180 90 L340 90 C350 90, 370 100, 380 110 L410 140 C420 150, 420 160, 420 170 L420 390 C420 410, 400 420, 380 420 L180 420 C160 420, 140 410, 140 390 Z" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="4" />
+  
+  <!-- Notebook Lines -->
+  <line x1="180" y1="160" x2="380" y2="160" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-linecap="round" />
+  <line x1="180" y1="210" x2="380" y2="210" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-linecap="round" />
+  <line x1="180" y1="260" x2="320" y2="260" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-linecap="round" />
+  <line x1="180" y1="310" x2="300" y2="310" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-linecap="round" />
+  <line x1="180" y1="360" x2="340" y2="360" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-linecap="round" />
+
+  <!-- Linked Nodes Visual -->
+  <g transform="translate(140, 180)">
+    <!-- First ring node -->
+    <circle cx="210" cy="110" r="28" fill="#1e1b4b" stroke="url(#linkGrad)" stroke-width="8" />
+    <!-- Connector line -->
+    <line x1="210" y1="110" x2="280" y2="40" stroke="url(#linkGrad)" stroke-width="10" stroke-linecap="round" />
+    <!-- Second ring node -->
+    <circle cx="280" cy="40" r="28" fill="#1e1b4b" stroke="url(#linkGrad)" stroke-width="8" />
+  </g>
+
+  <!-- Glowing AI Sparkle -->
+  <g transform="translate(340, 100)">
+    <!-- Main Sparkle shape -->
+    <path d="M 0,-40 C 0,-10 10,0 40,0 C 10,0 0,10 0,40 C 0,10 -10,0 -40,0 C -10,0 0,-10 0,-40 Z" fill="url(#sparkGrad)" />
+    <!-- Little secondary star -->
+    <path d="M 45,25 C 45,35 50,40 60,40 C 50,40 45,45 45,55 C 45,45 40,40 30,40 C 40,40 45,35 45,25 Z" fill="#e0e7ff" />
+  </g>
+</svg>
