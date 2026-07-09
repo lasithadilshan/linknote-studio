@@ -39,7 +39,7 @@ export function SharePage() {
       setLoading(true);
       setErrorMsg(null);
       try {
-        const decoded = shareService.parseShareLink(location.hash);
+        const decoded = shareService.parseShareLink(window.location.href);
         setSharedNote(decoded);
       } catch (err: any) {
         setErrorMsg(err.message || 'The snapshot note link is truncated or corrupted.');
@@ -49,7 +49,7 @@ export function SharePage() {
     };
 
     decodeLink();
-  }, [location.hash]);
+  }, [location.hash, location.search]);
 
   const handleSaveToBrowser = async () => {
     if (!sharedNote) return;

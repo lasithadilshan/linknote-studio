@@ -32,23 +32,49 @@ export const shareService = {
     const jsonString = JSON.stringify(payload);
     const compressed = LZString.compressToEncodedURIComponent(jsonString);
     
-    // We construct a full URL to the /share route with the compressed payload in the hash
+    // Construct the correct base path using import.meta.env.BASE_URL
     const origin = window.location.origin;
-    return `${origin}/share#data=${compressed}`;
+    const baseUrl = (import.meta as any).env?.BASE_URL || '/';
+    // Ensure we avoid double slashes and have a trailing slash before HashRouter path
+    const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    
+    return `${origin}${normalizedBaseUrl}#/share?data=${compressed}`;
   },
 
   /**
    * Decodes a compressed URL hash segment into a readable note object
    */
-  parseShareLink(hash: string): Partial<Note> & { sharedAt?: string } {
+  parseShareLink(inputString: string): Partial<Note> & { sharedAt?: string } {
     try {
-      // Find 'data=' in the hash
-      const dataIndex = hash.indexOf('data=');
-      if (dataIndex === -1) {
+      let compressedData = '';
+
+      // 1. Try using URLSearchParams if there is a query string somewhere
+      if (inputString.includes('?')) {
+        const queryString = inputString.split('?')[1];
+        // Clean up any hash fragments if they exist after the query string
+        const cleanQueryString = queryString.split('#')[0];
+        const params = new URLSearchParams(cleanQueryString);
+        const dataParam = params.get('data');
+        if (dataParam) {
+          compressedData = dataParam;
+        }
+      }
+
+      // 2. Fallback: Search for 'data=' anywhere in the input
+      if (!compressedData) {
+        const dataIndex = inputString.indexOf('data=');
+        if (dataIndex !== -1) {
+          // Extract everything after 'data='
+          const temp = inputString.substring(dataIndex + 5);
+          // Split at next '&' or '#' or '/' if present to avoid trailing garbage
+          compressedData = temp.split(/[&#]/)[0];
+        }
+      }
+
+      if (!compressedData) {
         throw new Error('No shared data payload found in link.');
       }
 
-      const compressedData = hash.substring(dataIndex + 5);
       const decompressed = LZString.decompressFromEncodedURIComponent(compressedData);
       
       if (!decompressed) {
