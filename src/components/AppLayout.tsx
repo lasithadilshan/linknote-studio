@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { ThemeToggle } from './ThemeToggle';
-import { NotebookText, Download, FileJson, X, Settings, Sparkles } from 'lucide-react';
+import { NotebookText, Download, FileJson, X, Settings, Sparkles, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ImportExportPanel } from './ImportExportPanel';
 import { AnimatePresence, motion } from 'motion/react';
@@ -42,6 +42,13 @@ export function AppLayout({ children, onRefreshNotes }: AppLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              to="/about"
+              className="p-2 border border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 backdrop-blur-xs rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer shadow-xs"
+              title="About & Documentation"
+            >
+              <BookOpen className="h-4.5 w-4.5" />
+            </Link>
             <Link
               to="/settings"
               className="p-2 border border-indigo-500/20 dark:border-indigo-400/20 bg-indigo-500/5 hover:bg-indigo-500/10 backdrop-blur-xs rounded-full text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer shadow-xs"
