@@ -75,9 +75,9 @@ export function SearchBar({
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent text-slate-700 dark:text-slate-200 focus:outline-hidden pr-1.5 text-xs font-semibold uppercase cursor-pointer"
             >
-              <option value="updated">Recently Updated</option>
-              <option value="created">Date Created</option>
-              <option value="title">Alphabetical (A-Z)</option>
+              <option value="updated" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Recently Updated</option>
+              <option value="created" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Date Created</option>
+              <option value="title" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Alphabetical (A-Z)</option>
             </select>
           </div>
         </div>

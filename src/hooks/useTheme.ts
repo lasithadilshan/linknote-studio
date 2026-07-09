@@ -8,13 +8,24 @@ import { Theme } from '../types';
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('linknote_theme') as Theme;
+    const saved = localStorage.getItem('linknote-theme') as Theme;
     return saved || 'system';
   });
 
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+    if (theme === 'dark') return 'dark';
+    if (theme === 'light') return 'light';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
   const setTheme = (newTheme: Theme) => {
-    localStorage.setItem('linknote_theme', newTheme);
+    localStorage.setItem('linknote-theme', newTheme);
     setThemeState(newTheme);
+  };
+
+  const toggleTheme = () => {
+    const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
   };
 
   useEffect(() => {
@@ -22,16 +33,18 @@ export function useTheme() {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
-      let isDark = false;
+      let active: 'light' | 'dark' = 'light';
       if (theme === 'dark') {
-        isDark = true;
+        active = 'dark';
       } else if (theme === 'light') {
-        isDark = false;
+        active = 'light';
       } else {
-        isDark = mediaQuery.matches;
+        active = mediaQuery.matches ? 'dark' : 'light';
       }
 
-      if (isDark) {
+      setResolvedTheme(active);
+
+      if (active === 'dark') {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
@@ -52,5 +65,7 @@ export function useTheme() {
     };
   }, [theme]);
 
-  return { theme, setTheme };
+  const isDark = resolvedTheme === 'dark';
+
+  return { theme, resolvedTheme, setTheme, toggleTheme, isDark };
 }
