@@ -106,22 +106,22 @@ export function SettingsPage() {
         </div>
 
         {/* Page Title Card */}
-        <div className="bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md p-6 sm:p-8 rounded-3xl space-y-2">
-          <h1 className="text-2xl font-extrabold tracking-tight font-display bg-linear-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl space-y-2 shadow-sm">
+          <h1 className="text-2xl font-extrabold tracking-tight font-display text-slate-950 dark:text-slate-50">
             System Settings
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Configure system capabilities, custom AI providers, visual styling themes, and local browser data backups.
           </p>
         </div>
 
         {/* Segmented Navigation Tabs */}
-        <div className="flex border-b border-slate-200/55 dark:border-white/10 gap-1 p-1 bg-slate-100/60 dark:bg-slate-950/20 rounded-2xl max-w-md">
+        <div className="flex border border-slate-200 dark:border-slate-800 gap-1 p-1 bg-slate-100 dark:bg-slate-950 rounded-2xl max-w-md">
           <button
             onClick={() => setActiveTab('ai')}
             className={`flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all cursor-pointer ${
               activeTab === 'ai'
-                ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -131,7 +131,7 @@ export function SettingsPage() {
             onClick={() => setActiveTab('appearance')}
             className={`flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all cursor-pointer ${
               activeTab === 'appearance'
-                ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -141,7 +141,7 @@ export function SettingsPage() {
             onClick={() => setActiveTab('storage')}
             className={`flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all cursor-pointer ${
               activeTab === 'storage'
-                ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -150,7 +150,7 @@ export function SettingsPage() {
         </div>
 
         {/* Tab Content Panels */}
-        <div className="bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md p-6 sm:p-8 rounded-3xl min-h-[300px]">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl min-h-[300px] shadow-sm">
           
           {/* AI Tab */}
           {activeTab === 'ai' && (
@@ -192,8 +192,8 @@ export function SettingsPage() {
                   }}
                   className={`flex flex-col items-start p-5 border rounded-2xl transition-all cursor-pointer text-left ${
                     theme === 'light'
-                      ? 'border-indigo-500 bg-indigo-500/[0.04]'
-                      : 'border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:border-indigo-500/20'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/20'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-indigo-500/30 hover:bg-slate-100 dark:hover:bg-slate-900'
                   }`}
                 >
                   <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl mb-3">
@@ -213,8 +213,8 @@ export function SettingsPage() {
                   }}
                   className={`flex flex-col items-start p-5 border rounded-2xl transition-all cursor-pointer text-left ${
                     theme === 'dark'
-                      ? 'border-indigo-500 bg-indigo-500/[0.04]'
-                      : 'border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:border-indigo-500/20'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/20'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-indigo-500/30 hover:bg-slate-100 dark:hover:bg-slate-900'
                   }`}
                 >
                   <div className="p-2 bg-indigo-500/15 text-indigo-400 rounded-xl mb-3">
@@ -234,8 +234,8 @@ export function SettingsPage() {
                   }}
                   className={`flex flex-col items-start p-5 border rounded-2xl transition-all cursor-pointer text-left ${
                     theme === 'system'
-                      ? 'border-indigo-500 bg-indigo-500/[0.04]'
-                      : 'border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:border-indigo-500/20'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/20'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-indigo-500/30 hover:bg-slate-100 dark:hover:bg-slate-900'
                   }`}
                 >
                   <div className="p-2 bg-slate-500/15 text-slate-500 rounded-xl mb-3">
@@ -276,7 +276,7 @@ export function SettingsPage() {
 
               {/* Stats Card */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-white/10 rounded-2xl">
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl">
                   <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                     Note Count
                   </div>
@@ -288,7 +288,7 @@ export function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-white/10 rounded-2xl">
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl">
                   <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                     Estimated Size
                   </div>
@@ -300,7 +300,7 @@ export function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-white/10 rounded-2xl">
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl">
                   <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                     Last Modified
                   </div>

@@ -95,19 +95,19 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Title / Hero Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 pb-2 border-b border-slate-100 dark:border-slate-900">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight font-display bg-linear-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-extrabold tracking-tight font-display text-slate-950 dark:text-slate-50">
             My Workspace
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 max-w-2xl">
             Create, encrypt, format, and share your notes. Kept 100% locally in your browser.
           </p>
         </div>
 
         <button
           onClick={handleCreateNote}
-          className="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer text-center"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-sm shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer text-center shrink-0 self-start md:self-auto"
         >
           <FilePlus className="h-4.5 w-4.5" />
           Create New Note
@@ -135,14 +135,14 @@ export function DashboardPage() {
         </div>
       ) : filteredNotes.length === 0 ? (
         /* Empty State */
-        <div className="py-20 border border-slate-200/50 dark:border-white/10 rounded-3xl bg-white/40 dark:bg-slate-900/10 backdrop-blur-md p-8 text-center flex flex-col items-center justify-center max-w-xl mx-auto mt-6">
-          <div className="p-4 bg-slate-100 dark:bg-white/5 border border-slate-200/40 dark:border-white/5 rounded-2xl text-slate-400 dark:text-slate-500 mb-4">
+        <div className="py-20 border border-slate-200 dark:border-slate-800 rounded-3xl bg-white dark:bg-slate-900 p-8 text-center flex flex-col items-center justify-center max-w-xl mx-auto mt-6 shadow-sm">
+          <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-500 mb-4">
             <Inbox className="h-8 w-8" />
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 font-display">
             {searchQuery || selectedTag || onlyFavorites ? 'No Matching Notes Found' : 'Your Workspace is Empty'}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mt-2 mb-6">
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mt-2 mb-6 leading-relaxed">
             {searchQuery || selectedTag || onlyFavorites
               ? 'Try modifying your search keywords, clear active tag filters, or toggle off the starred filter.'
               : 'Create your very first note to get started! Notes are automatically auto-saved to IndexedDB.'}
@@ -154,7 +154,7 @@ export function DashboardPage() {
                 setSelectedTag(null);
                 setOnlyFavorites(false);
               }}
-              className="px-4 py-2 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold uppercase cursor-pointer"
+              className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold uppercase cursor-pointer"
             >
               Clear Filters
             </button>

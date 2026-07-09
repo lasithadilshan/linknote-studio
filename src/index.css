@@ -247,3 +247,16 @@
 .dark .markdown-body th {
   background-color: var(--color-zinc-800/40);
 }
+
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-slate-50);
+}
+
+.dark body {
+  background-color: var(--color-slate-950);
+}

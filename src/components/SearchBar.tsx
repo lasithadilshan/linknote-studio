@@ -40,12 +40,12 @@ export function SearchBar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search notes by title, tag, or content..."
-            className="w-full pl-11 pr-10 py-3 bg-white/50 dark:bg-slate-900/30 border border-slate-200/55 dark:border-white/10 backdrop-blur-md rounded-2xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-xs"
+            className="w-full pl-11 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all shadow-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-3.5 p-0.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              className="absolute right-3 top-3.5 p-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
@@ -57,18 +57,18 @@ export function SearchBar({
           {/* Favorite filter */}
           <button
             onClick={() => setOnlyFavorites(!onlyFavorites)}
-            className={`inline-flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border transition-all duration-200 cursor-pointer shadow-xs backdrop-blur-md ${
+            className={`inline-flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold border transition-all duration-200 cursor-pointer shadow-xs ${
               onlyFavorites
-                ? 'bg-amber-500/10 dark:bg-amber-500/10 border-amber-500/30 dark:border-amber-500/30 text-amber-600 dark:text-amber-400'
-                : 'bg-white/50 dark:bg-slate-900/30 border-slate-200/55 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white/70 dark:hover:bg-slate-900/50'
+                ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-300'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <Star className={`h-4 w-4 ${onlyFavorites ? 'fill-amber-500' : ''}`} />
+            <Star className={`h-4 w-4 ${onlyFavorites ? 'fill-amber-500 text-amber-500 dark:text-amber-300' : ''}`} />
             <span>Starred</span>
           </button>
 
           {/* Sort selection */}
-          <div className="relative inline-flex items-center gap-1.5 px-4 py-3 bg-white/50 dark:bg-slate-900/30 border border-slate-200/55 dark:border-white/10 backdrop-blur-md rounded-2xl text-sm font-semibold text-slate-600 dark:text-slate-400 shadow-xs">
+          <div className="relative inline-flex items-center gap-1.5 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-xs">
             <SortAsc className="h-4 w-4 text-slate-400 shrink-0" />
             <select
               value={sortBy}
@@ -93,10 +93,10 @@ export function SearchBar({
 
           <button
             onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-full border backdrop-blur-md transition-all cursor-pointer ${
+            className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${
               selectedTag === null
-                ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-950 shadow-sm'
-                : 'bg-white/40 dark:bg-slate-900/20 border-slate-200/50 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-900/40'
+                ? 'bg-slate-900 border-slate-900 text-white dark:bg-slate-100 dark:border-slate-100 dark:text-slate-950 shadow-xs'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800'
             }`}
           >
             All Notes
@@ -106,10 +106,10 @@ export function SearchBar({
             <button
               key={tag}
               onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-full border backdrop-blur-md transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
                 selectedTag === tag
                   ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-600 dark:border-indigo-600 shadow-xs shadow-indigo-500/20'
-                  : 'bg-white/40 dark:bg-slate-900/20 border-slate-200/50 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-900/40'
+                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800'
               }`}
             >
               <span>{tag}</span>
