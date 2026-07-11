@@ -69,7 +69,7 @@ export function AppLayout({ children, onRefreshNotes }: AppLayoutProps) {
       </header>
 
       {/* Main Body Stage */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col z-10">
+      <main className="flex-1 w-full mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 xl:px-10 flex flex-col z-10">
         {children}
       </main>
 

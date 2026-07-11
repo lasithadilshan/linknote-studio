@@ -121,11 +121,11 @@ export function NoteEditor({
   const stats = calculateStats(localContent);
 
   return (
-    <div id="note-editor-workspace" className="flex-1 flex flex-col min-h-0 bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md rounded-3xl overflow-hidden transition-colors shadow-xs">
+    <div id="note-editor-workspace" className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
       
       {/* Note Metadata Header (Title, tags creation) - Hidden or minimized in focus mode */}
       {!isFocusMode && (
-        <div className="p-5 border-b border-slate-200/50 dark:border-white/10 flex flex-col gap-4">
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-850 flex flex-col gap-4">
           
           {/* Note Title Input */}
           <input
@@ -133,26 +133,27 @@ export function NoteEditor({
             value={localTitle}
             onChange={(e) => setLocalTitle(e.target.value)}
             placeholder="Title your note..."
-            className="w-full text-2xl font-bold tracking-tight font-display bg-transparent border-none focus:outline-hidden placeholder-slate-300 dark:placeholder-slate-700 text-slate-900 dark:text-slate-100"
+            className="w-full text-2xl font-bold tracking-tight font-display bg-transparent border-none focus:outline-hidden placeholder-slate-300 dark:placeholder-slate-700 text-slate-950 dark:text-slate-50"
           />
 
           {/* Tags management row */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1 select-none">
-              <Tag className="h-3 w-3" />
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5 select-none">
+              <Tag className="h-3.5 w-3.5" />
               Tags:
             </span>
 
             {localTags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold"
+                className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-xs font-semibold"
               >
                 <span>{tag}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                  className="p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-750 rounded-full transition-colors cursor-pointer"
+                  aria-label={`Remove tag ${tag}`}
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -166,7 +167,7 @@ export function NoteEditor({
                 value={newTagText}
                 onChange={(e) => setNewTagText(e.target.value)}
                 placeholder="Add tag..."
-                className="px-2.5 py-1 border border-slate-200/60 dark:border-white/10 rounded-xl bg-transparent text-xs text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                className="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-full bg-transparent text-xs text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors"
               />
             </form>
           </div>
@@ -174,13 +175,13 @@ export function NoteEditor({
       )}
 
       {/* Main split editing workspace pane */}
-      <div className="flex-1 flex min-h-0 divide-x divide-slate-200/50 dark:divide-white/10">
+      <div className="flex-1 flex flex-col md:flex-row min-h-0 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-850">
         
         {/* Editor Area (Visible in 'edit' or 'split') */}
         {(editorMode === 'edit' || editorMode === 'split') && (
-          <div className="flex-1 flex flex-col h-full bg-transparent">
+          <div className="flex-1 flex flex-col h-full bg-transparent min-w-0">
             {isFocusMode && (
-              <div className="px-6 pt-5 pb-2 text-center text-xs text-slate-400 dark:text-slate-500 font-medium select-none uppercase tracking-widest border-b border-slate-200/40 dark:border-white/5">
+              <div className="px-6 pt-5 pb-2 text-center text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest border-b border-slate-100 dark:border-slate-850">
                 — Focus Mode Active —
               </div>
             )}
@@ -223,7 +224,7 @@ export function NoteEditor({
                 }
               }}
               placeholder="Start writing in markdown or plain text..."
-              className={`w-full flex-1 p-6 bg-transparent border-none resize-none focus:outline-hidden text-slate-800 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 overflow-y-auto leading-relaxed ${
+              className={`w-full flex-1 p-5 sm:p-6 bg-transparent border-none resize-none focus:outline-hidden text-slate-800 dark:text-slate-200 placeholder-slate-300 dark:placeholder-slate-700 overflow-y-auto leading-relaxed ${
                 note.isCode ? 'font-mono text-sm' : 'font-sans text-base'
               } ${isFocusMode ? 'max-w-3xl mx-auto text-lg' : ''}`}
             />
@@ -232,10 +233,10 @@ export function NoteEditor({
 
         {/* Markdown compiler preview panel (Visible in 'preview' or 'split') */}
         {(editorMode === 'preview' || editorMode === 'split') && (
-          <div className="flex-1 h-full overflow-y-auto bg-slate-500/5">
+          <div className="flex-1 h-full overflow-y-auto bg-slate-500/[0.02] min-w-0">
             {editorMode === 'split' && (
-              <div className="px-5 py-3 border-b border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/10 backdrop-blur-xs flex items-center gap-1.5 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase select-none">
-                <FileText className="h-3.5 w-3.5 text-indigo-500" />
+              <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-850 bg-white/50 dark:bg-slate-900/50 flex items-center gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase select-none">
+                <FileText className="h-4 w-4 text-indigo-500" />
                 Live Markdown Compile View
               </div>
             )}
@@ -245,25 +246,25 @@ export function NoteEditor({
       </div>
 
       {/* Editor Status/Metrics Footer */}
-      <div className="px-5 py-3.5 bg-white/40 dark:bg-slate-900/40 border-t border-slate-200/50 dark:border-white/10 flex flex-wrap items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 gap-3 select-none">
+      <div className="px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-850 flex flex-wrap items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 gap-4 select-none">
         
         {/* Metric widgets */}
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5" title="Word count">
-            <FileText className="h-3.5 w-3.5 text-slate-400" />
+            <FileText className="h-4 w-4 text-slate-400" />
             <span>{stats.words} Words</span>
           </span>
           <span className="flex items-center gap-1.5" title="Character count">
-            <AlignLeft className="h-3.5 w-3.5 text-slate-400" />
+            <AlignLeft className="h-4 w-4 text-slate-400" />
             <span>{stats.chars} Characters</span>
           </span>
           <span className="flex items-center gap-1.5" title="Line count">
-            <Code className="h-3.5 w-3.5 text-slate-400" />
+            <Code className="h-4 w-4 text-slate-400" />
             <span>{stats.lines} Lines</span>
           </span>
           <span className="flex items-center gap-1.5" title="Estimated reading time">
-            <Clock className="h-3.5 w-3.5 text-slate-400" />
-            <span>~{stats.readingTime} min read</span>
+            <Clock className="h-4 w-4 text-slate-400" />
+            <span>~{stats.readingTime} Min Read</span>
           </span>
         </div>
 

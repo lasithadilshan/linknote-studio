@@ -504,7 +504,7 @@ export function NotePage() {
         {/* Locked Overlay Card - displayed if note is locked and not unlocked in session */}
         {!isUnlocked ? (
           <div className="flex-1 flex items-center justify-center py-16">
-            <div className="bg-white/60 dark:bg-slate-900/40 border border-slate-200/50 dark:border-white/10 backdrop-blur-md p-8 rounded-3xl shadow-xl max-w-md w-full text-center flex flex-col items-center">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-xl max-w-md w-full text-center flex flex-col items-center">
               <div className="p-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full mb-4">
                 <Lock className="h-8 w-8" />
               </div>

@@ -17,7 +17,6 @@ import {
   Copy,
   Download,
   AlertCircle,
-  FileText,
   Tag,
   ArrowLeft,
   Calendar,
@@ -99,55 +98,57 @@ export function SharePage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col gap-6 max-w-5xl mx-auto w-full">
+      <div className="flex-1 flex flex-col gap-6 max-w-5xl mx-auto w-full pb-16">
         {/* Navigation line */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="p-2 border border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold uppercase animate-pulse-hover"
+            className="p-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 rounded-xl transition-all cursor-pointer flex items-center gap-2 text-xs font-bold uppercase"
           >
             <ArrowLeft className="h-4 w-4" />
             Go to Dashboard
           </button>
           
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-3.5 py-1.5 rounded-full select-none">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-4 py-2 rounded-full select-none">
             <Share2 className="h-3.5 w-3.5" />
             Immutable Snapshot Mode
           </span>
         </div>
 
         {loading ? (
-          <div className="py-20 text-center flex flex-col items-center justify-center gap-3">
-            <div className="h-8 w-8 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
-            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 animate-pulse">Decompressing note snapshot...</span>
+          <div className="py-24 text-center flex flex-col items-center justify-center gap-4">
+            <div className="h-10 w-10 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-400 animate-pulse uppercase tracking-wider">
+              Decompressing note snapshot...
+            </span>
           </div>
         ) : errorMsg ? (
           /* Error Page state */
-          <div className="py-20 border border-slate-200/50 dark:border-white/10 backdrop-blur-md rounded-3xl bg-white/60 dark:bg-slate-900/30 p-8 text-center flex flex-col items-center justify-center max-w-md mx-auto">
-            <div className="p-4 bg-rose-500/10 text-rose-500 rounded-full mb-4">
-              <AlertCircle className="h-8 w-8" />
+          <div className="py-16 border border-slate-200 dark:border-slate-800 rounded-3xl bg-white dark:bg-slate-900 p-8 sm:p-12 text-center flex flex-col items-center justify-center max-w-md mx-auto shadow-xs">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center bg-rose-50 dark:bg-rose-950/40 text-rose-500 border border-rose-100 dark:border-rose-900/30 mb-6">
+              <AlertCircle className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 font-display">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 font-display">
               Corrupted Share Link
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 mb-8 leading-relaxed">
               {errorMsg}
             </p>
             <button
               onClick={() => navigate('/')}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/25 cursor-pointer"
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer select-none"
             >
               Back to Dashboard
             </button>
           </div>
         ) : sharedNote ? (
           /* Main viewable layout */
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Action Bar Header card */}
-            <div className="bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md p-5 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="space-y-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 font-display">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-2xl font-bold text-slate-950 dark:text-slate-50 font-display">
                     {sharedNote.title || 'Untitled Shared Note'}
                   </h1>
                   {sharedNote.isCode && (
@@ -159,7 +160,7 @@ export function SharePage() {
                 </div>
                 
                 {sharedNote.sharedAt && (
-                  <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1.5 select-none">
                     <Calendar className="h-3.5 w-3.5" />
                     Shared on: {new Date(sharedNote.sharedAt).toLocaleString()}
                   </p>
@@ -167,42 +168,44 @@ export function SharePage() {
               </div>
 
               {/* Operations deck */}
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
                 <button
                   onClick={handleSaveToBrowser}
-                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all cursor-pointer"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer select-none"
                 >
-                  <Import className="h-4 w-4" />
+                  <Import className="h-4.5 w-4.5" />
                   Save Copy to My Browser
                 </button>
                 <button
                   onClick={handleCopyText}
-                  className="p-2.5 border border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl transition-all cursor-pointer"
+                  className="p-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 rounded-2xl transition-all cursor-pointer shadow-xs"
                   title="Copy plaintext to clipboard"
+                  aria-label="Copy plaintext"
                 >
-                  <Copy className="h-4 w-4" />
+                  <Copy className="h-4.5 w-4.5" />
                 </button>
                 <button
                   onClick={handleDownloadTxt}
-                  className="p-2.5 border border-slate-200/60 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl transition-all cursor-pointer"
+                  className="p-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 rounded-2xl transition-all cursor-pointer shadow-xs"
                   title="Download as .txt"
+                  aria-label="Download plain text"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-4.5 w-4.5" />
                 </button>
               </div>
             </div>
 
             {/* Tags row */}
             {sharedNote.tags && sharedNote.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 items-center bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md p-3 rounded-2xl">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1 select-none mr-1">
-                  <Tag className="h-3.5 w-3.5" />
+              <div className="flex flex-wrap gap-2 items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-xs">
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5 select-none mr-1.5">
+                  <Tag className="h-4 w-4" />
                   Tags:
                 </span>
                 {sharedNote.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center text-[11px] font-semibold text-slate-600 dark:text-slate-400 px-2.5 py-0.5 bg-slate-100/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5 rounded-md"
+                    className="inline-flex items-center text-xs font-bold text-slate-600 dark:text-slate-400 px-3 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full"
                   >
                     {tag}
                   </span>
@@ -211,8 +214,8 @@ export function SharePage() {
             )}
 
             {/* Read-Only Document Paper Layout */}
-            <div className="bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-md rounded-3xl overflow-hidden min-h-[400px] flex flex-col">
-              <div className="px-5 py-2.5 bg-slate-500/5 text-slate-400 select-none text-[10px] font-bold uppercase tracking-wider border-b border-slate-200/50 dark:border-white/10">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden min-h-[400px] flex flex-col shadow-xs">
+              <div className="px-5 py-3 bg-slate-50 dark:bg-slate-950 text-slate-400 select-none text-[10px] font-bold uppercase tracking-wider border-b border-slate-100 dark:border-slate-850">
                 — Document Read-Only Stage —
               </div>
               <div className="flex-1 overflow-y-auto">
