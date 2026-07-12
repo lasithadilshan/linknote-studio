@@ -25,6 +25,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/note/:id" element={<NotePage />} />
           <Route path="/share" element={<SharePage />} />
+          <Route path="/s" element={<SharePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </HashRouter>
