@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
-import { NotebookText, Download, FileJson, X, Settings, Sparkles, BookOpen } from 'lucide-react';
+import { NotebookText, Download, FileJson, X, Settings, Sparkles, BookOpen, Wifi, WifiOff, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ImportExportPanel } from './ImportExportPanel';
+import { CommandPalette } from './CommandPalette';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface AppLayoutProps {
@@ -17,9 +18,24 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, onRefreshNotes }: AppLayoutProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 flex flex-col font-sans transition-colors duration-200 relative overflow-x-hidden">
+      {/* Global Command Palette listener */}
+      <CommandPalette />
+
       {/* Premium frosted ambient background glows in dark mode */}
       <div className="absolute top-[-10%] left-[-15%] w-[60%] h-[50%] rounded-full bg-indigo-600/10 blur-[130px] pointer-events-none hidden dark:block" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[60%] h-[50%] rounded-full bg-emerald-500/5 blur-[130px] pointer-events-none hidden dark:block" />
@@ -37,8 +53,27 @@ export function AppLayout({ children, onRefreshNotes }: AppLayoutProps) {
               </span>
             </Link>
             <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-0.5 bg-white/10 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200/30 dark:border-white/5 backdrop-blur-xs select-none">
-              v1.0 (Web Crypto GCM)
+              v1.0
             </span>
+
+            {/* Offline/Local-First Status Indicators */}
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full select-none" title="All notes are secured locally using 256-bit Web Crypto.">
+              <Database className="h-3 w-3" />
+              <span>Local-First (IndexedDB)</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
+
+            {isOnline ? (
+              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 border border-transparent dark:border-white/5 rounded-full select-none" title="Connected to network">
+                <Wifi className="h-3 w-3" />
+                <span>Online</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full select-none animate-pulse" title="Offline mode: Notes are saved locally and synced when online">
+                <WifiOff className="h-3 w-3" />
+                <span>Offline</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3">

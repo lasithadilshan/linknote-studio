@@ -127,14 +127,34 @@ export function NoteEditor({
       {!isFocusMode && (
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-850 flex flex-col gap-4">
           
-          {/* Note Title Input */}
-          <input
-            type="text"
-            value={localTitle}
-            onChange={(e) => setLocalTitle(e.target.value)}
-            placeholder="Title your note..."
-            className="w-full text-2xl font-bold tracking-tight font-display bg-transparent border-none focus:outline-hidden placeholder-slate-300 dark:placeholder-slate-700 text-slate-950 dark:text-slate-50"
-          />
+          {/* Note Title Input & Folder Selector */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <input
+              type="text"
+              value={localTitle}
+              onChange={(e) => setLocalTitle(e.target.value)}
+              placeholder="Title your note..."
+              className="flex-1 text-2xl font-bold tracking-tight font-display bg-transparent border-none focus:outline-hidden placeholder-slate-300 dark:placeholder-slate-700 text-slate-950 dark:text-slate-50"
+            />
+            
+            {/* Folder Dropdown Selector */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest select-none">
+                Folder:
+              </span>
+              <select
+                value={note.folder || 'Personal'}
+                onChange={(e) => onNoteChange({ folder: e.target.value })}
+                className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-250 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+              >
+                {['Personal', 'Work', 'Study', 'Projects', 'Ideas', 'Archive'].map((folder) => (
+                  <option key={folder} value={folder}>
+                    {folder}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* Tags management row */}
           <div className="flex flex-wrap items-center gap-2">

@@ -29,7 +29,8 @@ import {
   Plus,
   Code2,
   MoreVertical,
-  ChevronDown
+  ChevronDown,
+  History
 } from 'lucide-react';
 
 interface EditorToolbarProps {
@@ -53,6 +54,8 @@ interface EditorToolbarProps {
   onCreateNewNote: () => void;
   isAiOpen: boolean;
   setIsAiOpen: (open: boolean) => void;
+  isHistoryOpen?: boolean;
+  onToggleHistory?: () => void;
 }
 
 const SUPPORTED_LANGUAGES = [
@@ -88,6 +91,8 @@ export function EditorToolbar({
   onCreateNewNote,
   isAiOpen,
   setIsAiOpen,
+  isHistoryOpen = false,
+  onToggleHistory,
 }: EditorToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isActionsDropdownOpen, setIsActionsDropdownOpen] = useState(false);
@@ -258,6 +263,22 @@ export function EditorToolbar({
             {isFocusMode ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
             <span>Focus Mode</span>
           </button>
+
+          {/* Version history toggle */}
+          {onToggleHistory && (
+            <button
+              onClick={onToggleHistory}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
+                isHistoryOpen
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/15'
+                  : 'bg-white/40 dark:bg-white/5 border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/10'
+              }`}
+              title="Toggle note version history snapshots"
+            >
+              <History className="h-3.5 w-3.5" />
+              <span>History</span>
+            </button>
+          )}
 
           {/* Code switch */}
           <button

@@ -17,6 +17,18 @@ export interface Note {
   codeLanguage: string;
   createdAt: string;
   updatedAt: string;
+  // New fields for advanced workspace optimization
+  folder?: string;
+  isDeleted?: boolean;
+  deletedAt?: string;
+}
+
+export interface NoteVersion {
+  id: string;
+  noteId: string;
+  title: string;
+  content: string;
+  createdAt: string;
 }
 
 export type Theme = 'light' | 'dark' | 'system';

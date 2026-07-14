@@ -4,17 +4,21 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Note } from '../types';
+import { Note, NoteVersion } from '../types';
 import { noteStorage } from '../services/noteStorage';
+
+export const DEFAULT_FOLDERS = ['All Notes', 'Personal', 'Work', 'Study', 'Projects', 'Ideas', 'Archive'];
 
 export function useNotes() {
   const [allNotes, setAllNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filter and search state
+  // Filter, Search, Trash, and Folder states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<string>('All Notes');
+  const [showTrash, setShowTrash] = useState(false);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [sortBy, setSortBy] = useState<'updated' | 'created' | 'title'>('updated');
 
@@ -35,11 +39,12 @@ export function useNotes() {
     loadNotes();
   }, [loadNotes]);
 
-  // Aggregate all unique tags from all notes
+  // Aggregate all unique tags from active notes
   const allTags = useMemo(() => {
     const tagsSet = new Set<string>();
     allNotes.forEach((note) => {
-      if (Array.isArray(note.tags)) {
+      // Only extract tags from non-deleted notes
+      if (!note.isDeleted && Array.isArray(note.tags)) {
         note.tags.forEach((t) => {
           if (t && t.trim() !== '') {
             tagsSet.add(t.trim());
@@ -50,17 +55,29 @@ export function useNotes() {
     return Array.from(tagsSet).sort();
   }, [allNotes]);
 
-  // Apply search, filter, and sort logic client-side
+  // Apply search, folder, trash, filter, and sort logic client-side
   const filteredNotes = useMemo(() => {
     let result = [...allNotes];
 
+    // Filter by trash state
+    if (showTrash) {
+      result = result.filter((note) => note.isDeleted);
+    } else {
+      result = result.filter((note) => !note.isDeleted);
+    }
+
+    // Filter by folder (ignore filter if "All Notes" is selected)
+    if (selectedFolder !== 'All Notes' && !showTrash) {
+      result = result.filter((note) => note.folder === selectedFolder);
+    }
+
     // Filter by favorites
-    if (onlyFavorites) {
+    if (onlyFavorites && !showTrash) {
       result = result.filter((note) => note.isFavorite);
     }
 
     // Filter by tag
-    if (selectedTag) {
+    if (selectedTag && !showTrash) {
       result = result.filter((note) => note.tags.includes(selectedTag));
     }
 
@@ -88,11 +105,16 @@ export function useNotes() {
     });
 
     return result;
-  }, [allNotes, onlyFavorites, selectedTag, searchQuery, sortBy]);
+  }, [allNotes, showTrash, selectedFolder, onlyFavorites, selectedTag, searchQuery, sortBy]);
 
   // Mutators
   const createNote = async (noteData?: Partial<Note>) => {
-    const created = await noteStorage.createNote(noteData);
+    // If we're inside a folder, default the new note to that folder
+    const folderToUse = selectedFolder !== 'All Notes' ? selectedFolder : 'Personal';
+    const created = await noteStorage.createNote({
+      folder: folderToUse,
+      ...noteData,
+    });
     setAllNotes((prev) => [created, ...prev]);
     return created;
   };
@@ -109,7 +131,23 @@ export function useNotes() {
 
   const deleteNote = async (id: string) => {
     await noteStorage.deleteNote(id);
+    // Refresh list from storage to get the updated status
+    await loadNotes();
+  };
+
+  const restoreNote = async (id: string) => {
+    await noteStorage.restoreNote(id);
+    await loadNotes();
+  };
+
+  const permanentlyDeleteNote = async (id: string) => {
+    await noteStorage.permanentlyDeleteNote(id);
     setAllNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const emptyTrash = async () => {
+    await noteStorage.emptyTrash();
+    await loadNotes();
   };
 
   const duplicateNote = async (id: string) => {
@@ -128,6 +166,10 @@ export function useNotes() {
     setSearchQuery,
     selectedTag,
     setSelectedTag,
+    selectedFolder,
+    setSelectedFolder,
+    showTrash,
+    setShowTrash,
     onlyFavorites,
     setOnlyFavorites,
     sortBy,
@@ -136,6 +178,9 @@ export function useNotes() {
     createNote,
     updateNote,
     deleteNote,
+    restoreNote,
+    permanentlyDeleteNote,
+    emptyTrash,
     duplicateNote,
   };
 }
