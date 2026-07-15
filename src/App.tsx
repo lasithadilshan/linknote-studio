@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ToastProvider, useToast } from './hooks/useToast';
 import { DashboardPage } from './pages/DashboardPage';
 import { NotePage } from './pages/NotePage';
@@ -156,10 +156,21 @@ function WikiLinkTitleRedirect() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <ToastProvider>
       <HashRouter>
+        <ScrollToTop />
         <AppLockGate>
           <CommandPalette />
           <Routes>

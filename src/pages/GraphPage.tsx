@@ -304,7 +304,7 @@ export function GraphPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 flex flex-col h-[calc(100vh-100px)]">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 flex flex-col min-h-[calc(100vh-12rem)] md:h-[calc(100vh-8rem)] w-full max-w-full overflow-hidden">
         
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-slate-850 shrink-0">
@@ -396,7 +396,7 @@ export function GraphPage() {
         </div>
 
         {/* Dynamic Simulation Container */}
-        <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/50 dark:border-white/5 relative shadow-inner overflow-hidden min-h-[300px]">
+        <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/50 dark:border-white/5 relative shadow-inner overflow-hidden min-h-[500px] sm:min-h-[600px] w-full max-w-full">
           {loading ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/10 dark:bg-slate-950/20 backdrop-blur-xs">
               <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3" />

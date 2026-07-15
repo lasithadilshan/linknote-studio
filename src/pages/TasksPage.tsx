@@ -322,15 +322,17 @@ export function TasksPage() {
                           <Square className="h-5 w-5" />
                         )}
                       </button>
-                      <span 
-                        className={`text-sm font-medium break-words max-w-full ${
-                          task.completed 
-                            ? 'text-slate-400 line-through' 
-                            : 'text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        {task.text}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <span 
+                          className={`text-sm font-medium break-words block ${
+                            task.completed 
+                              ? 'text-slate-400 line-through' 
+                              : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {task.text}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>

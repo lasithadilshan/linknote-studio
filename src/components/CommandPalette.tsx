@@ -68,6 +68,17 @@ export function CommandPalette() {
     }
   }, [isOpen]);
 
+  // Prevent backdrop body scroll when command palette is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Define commands
   const commands = [
     {

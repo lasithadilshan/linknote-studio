@@ -183,7 +183,7 @@ export function NoteEditor({
   const stats = calculateStats(localContent);
 
   return (
-    <div id="note-editor-workspace" className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+    <div id="note-editor-workspace" className="flex-1 flex flex-col min-h-[500px] md:h-[calc(100vh-14rem)] md:min-h-[550px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
       
       {/* Note Metadata Header (Title, tags creation) - Hidden or minimized in focus mode */}
       {!isFocusMode && (

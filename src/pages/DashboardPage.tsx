@@ -228,7 +228,7 @@ export function DashboardPage() {
         {/* Main Body Grid with Left Sidebar on Desktop */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)] items-start">
           {/* A. Responsive Sidebar Panel */}
-          <aside className="min-w-0 flex flex-col gap-6 w-full">
+          <aside className="min-w-0 flex flex-col gap-6 w-full lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto pr-1">
             
             {/* Desktop-only Navigation Folder lists */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 rounded-2xl p-4 shadow-xs">

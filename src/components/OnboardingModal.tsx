@@ -24,6 +24,17 @@ export function OnboardingModal({ onComplete, onImportTrigger, onCreateFirstNote
     }
   }, []);
 
+  // Prevent background body scrolling when open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   const handleSkip = () => {
     localStorage.setItem('linknote-onboarding-completed', 'true');
     setIsOpen(false);

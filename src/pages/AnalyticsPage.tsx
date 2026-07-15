@@ -97,7 +97,7 @@ export function AnalyticsPage() {
         </div>
 
         {/* Bento Grid: Basic Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-xs">
             <div className="flex justify-between items-start text-indigo-500">
               <Files className="h-4 w-4" />

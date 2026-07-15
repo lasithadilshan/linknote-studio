@@ -223,7 +223,7 @@ export function PresentationPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col items-center justify-start py-24 px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full">
+      <div className="flex-1 flex flex-col items-center justify-start pt-28 pb-36 px-4 sm:px-6 md:px-12 lg:px-24 max-w-4xl mx-auto w-full overflow-x-hidden">
         {/* Title */}
         <h1 
           className="w-full font-extrabold tracking-tight font-display mb-12 border-b border-slate-500/10 pb-6 text-center leading-tight"
