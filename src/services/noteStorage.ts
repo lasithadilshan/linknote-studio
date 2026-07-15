@@ -5,6 +5,8 @@
 
 import { Note, NoteVersion } from '../types';
 import { generateId } from '../utils/idGenerator';
+import { calculateTaskStats, parseTasks, toggleTaskInContent } from '../utils/taskParser';
+import { extractWikiLinks } from '../utils/wikiLinkParser';
 
 const DB_NAME = 'LinkNoteStudioDB';
 const DB_VERSION = 2; // Incremented DB_VERSION to accommodate version snapshots
@@ -38,6 +40,8 @@ function openDB(): Promise<IDBDatabase> {
 
 // Normalize notes loaded from IndexedDB to ensure backward compatibility
 const normalizeNote = (note: any): Note => {
+  const content = note.content || '';
+  const calculatedStats = calculateTaskStats(content);
   return {
     ...note,
     folder: note.folder || 'Personal',
@@ -46,6 +50,10 @@ const normalizeNote = (note: any): Note => {
     tags: Array.isArray(note.tags) ? note.tags : [],
     isCode: !!note.isCode,
     codeLanguage: note.codeLanguage || 'javascript',
+    type: note.type || 'note',
+    dailyDate: note.dailyDate || undefined,
+    linkedNoteTitles: note.linkedNoteTitles || extractWikiLinks(content),
+    taskStats: note.taskStats || calculatedStats,
   };
 };
 
@@ -608,5 +616,296 @@ export const noteStorage = {
         reject(new Error('Failed to clear notes from storage.'));
       };
     });
+  },
+
+  // --- LOCAL WORKSPACE UPGRADES ---
+
+  async getAllActiveNotes(): Promise<Note[]> {
+    return this.getActiveNotes();
+  },
+
+  async getNoteByTitle(title: string): Promise<Note | null> {
+    const active = await this.getActiveNotes();
+    const searchTitle = title.trim().toLowerCase();
+    const found = active.find(n => n.title.trim().toLowerCase() === searchTitle);
+    return found || null;
+  },
+
+  async createLinkedNote(title: string): Promise<Note> {
+    const cleanTitle = title.trim();
+    const existing = await this.getNoteByTitle(cleanTitle);
+    if (existing) return existing;
+
+    return this.createNote({
+      title: cleanTitle,
+      content: `# ${cleanTitle}\n\nStart writing here...`,
+      folder: 'Personal',
+      type: 'note',
+      tags: [],
+    });
+  },
+
+  async getBacklinks(noteTitle: string): Promise<Note[]> {
+    const active = await this.getActiveNotes();
+    const cleanTitle = noteTitle.trim().toLowerCase();
+    
+    // Find notes whose content contains [[noteTitle]] (case-insensitive)
+    return active.filter(n => {
+      const content = (n.content || '').toLowerCase();
+      // Look for [[title]] or variations
+      return content.includes(`[[${cleanTitle}]]`) || 
+             extractWikiLinks(n.content).some(link => link.toLowerCase() === cleanTitle);
+    });
+  },
+
+  async getOutgoingLinks(noteId: string): Promise<string[]> {
+    const note = await this.getNote(noteId);
+    if (!note) return [];
+    return extractWikiLinks(note.content || '');
+  },
+
+  async getOrCreateDailyNote(dateStr: string): Promise<Note> {
+    const active = await this.getActiveNotes();
+    // Daily notes title format: Daily Note - YYYY-MM-DD
+    const expectedTitle = `Daily Note - ${dateStr}`;
+    const found = active.find(n => n.type === 'daily' && n.dailyDate === dateStr);
+    if (found) return found;
+
+    // Create a new daily note using template
+    const template = `# Daily Note - ${dateStr}
+
+## Priorities
+- [ ] 
+
+## Notes
+
+## Meetings
+
+## Reflection
+
+## Tomorrow
+- [ ] `;
+
+    return this.createNote({
+      title: expectedTitle,
+      content: template,
+      folder: 'Personal',
+      type: 'daily',
+      dailyDate: dateStr,
+      tags: ['daily', 'journal'],
+    });
+  },
+
+  async getDailyNotes(): Promise<Note[]> {
+    const active = await this.getActiveNotes();
+    return active.filter(n => n.type === 'daily').sort((a, b) => {
+      const dateA = a.dailyDate || '';
+      const dateB = b.dailyDate || '';
+      return dateB.localeCompare(dateA); // newest first
+    });
+  },
+
+  async getTaskItems() {
+    const active = await this.getActiveNotes();
+    const allTasks: any[] = [];
+    active.forEach(n => {
+      const noteTasks = parseTasks(n.id, n.title, n.content, n.folder || 'Personal', n.tags || []);
+      allTasks.push(...noteTasks);
+    });
+    return allTasks;
+  },
+
+  async updateTaskStatus(noteId: string, taskIndex: number, completed: boolean): Promise<Note> {
+    const note = await this.getNote(noteId);
+    if (!note) throw new Error('Note not found');
+
+    const updatedContent = toggleTaskInContent(note.content, taskIndex, completed);
+    const updatedStats = calculateTaskStats(updatedContent);
+    const updatedLinks = extractWikiLinks(updatedContent);
+
+    return this.updateNote(noteId, {
+      content: updatedContent,
+      taskStats: updatedStats,
+      linkedNoteTitles: updatedLinks,
+    });
+  },
+
+  async getAnalyticsStats(): Promise<any> {
+    const notes = await this.getAllNotes();
+    const active = notes.filter(n => !n.isDeleted);
+    const deleted = notes.filter(n => n.isDeleted);
+    const starred = notes.filter(n => n.isFavorite);
+    const encrypted = notes.filter(n => n.isEncrypted);
+
+    let totalWords = 0;
+    let totalChars = 0;
+    active.forEach(n => {
+      const text = n.content || '';
+      totalChars += text.length;
+      totalWords += text.trim().split(/\s+/).filter(Boolean).length;
+    });
+
+    // Task scanning
+    const tasks = await this.getTaskItems();
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(t => t.completed).length;
+    const pendingTasks = totalTasks - completedTasks;
+    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    // Folders
+    const notesByFolder: Record<string, number> = {};
+    active.forEach(n => {
+      const f = n.folder || 'Personal';
+      notesByFolder[f] = (notesByFolder[f] || 0) + 1;
+    });
+
+    // Tags
+    const notesByTag: Record<string, number> = {};
+    active.forEach(n => {
+      if (Array.isArray(n.tags)) {
+        n.tags.forEach(t => {
+          if (t) notesByTag[t] = (notesByTag[t] || 0) + 1;
+        });
+      }
+    });
+
+    // Daily notes
+    const dailyNotes = active.filter(n => n.type === 'daily');
+    
+    // Streak calculation
+    let streak = 0;
+    if (dailyNotes.length > 0) {
+      const dates = dailyNotes
+        .map(n => n.dailyDate || '')
+        .filter(Boolean)
+        .sort((a, b) => b.localeCompare(a)); // newest first
+
+      // Calculate consecutive days starting from the newest journal date
+      if (dates.length > 0) {
+        streak = 1;
+        let lastDate = new Date(dates[0]);
+        for (let i = 1; i < dates.length; i++) {
+          const currentDate = new Date(dates[i]);
+          const diffTime = Math.abs(lastDate.getTime() - currentDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            streak++;
+            lastDate = currentDate;
+          } else if (diffDays > 1) {
+            break; // streak broken
+          }
+        }
+      }
+    }
+
+    // Size
+    let bytes = 0;
+    notes.forEach(n => {
+      bytes += (n.title?.length || 0) * 2;
+      bytes += (n.content?.length || 0) * 2;
+      bytes += (n.encryptedContent?.length || 0) * 2;
+      bytes += (n.tags?.join(',').length || 0) * 2;
+    });
+
+    const lastBackup = localStorage.getItem('linknote-last-backup-at');
+
+    return {
+      totalNotes: notes.length,
+      activeNotes: active.length,
+      deletedNotes: deleted.length,
+      starredNotes: starred.length,
+      encryptedNotes: encrypted.length,
+      totalWords,
+      totalChars,
+      totalTasks,
+      completedTasks,
+      pendingTasks,
+      completionRate,
+      notesByFolder,
+      notesByTag,
+      recentNotes: active.slice(0, 5),
+      dailyNotesCount: dailyNotes.length,
+      writingStreak: streak,
+      storageUsedKB: Math.round((bytes / 1024) * 100) / 100,
+      lastBackupDate: lastBackup,
+    };
+  },
+
+  async getGraphData(): Promise<{ nodes: any[]; links: any[] }> {
+    const active = await this.getActiveNotes();
+    const nodes = active.map(n => ({
+      id: n.id,
+      title: n.title,
+      folder: n.folder || 'Personal',
+      isFavorite: !!n.isFavorite,
+    }));
+
+    const links: any[] = [];
+    const titleToIdMap: Record<string, string> = {};
+    active.forEach(n => {
+      titleToIdMap[n.title.trim().toLowerCase()] = n.id;
+    });
+
+    active.forEach(n => {
+      const outgoing = extractWikiLinks(n.content || '');
+      outgoing.forEach(title => {
+        const targetId = titleToIdMap[title.trim().toLowerCase()];
+        if (targetId && targetId !== n.id) {
+          // Check if link already exists to avoid duplicates
+          const exists = links.some(l => l.source === n.id && l.target === targetId);
+          if (!exists) {
+            links.push({
+              source: n.id,
+              target: targetId,
+            });
+          }
+        }
+      });
+    });
+
+    return { nodes, links };
+  },
+
+  async exportTasks(format: 'json' | 'md'): Promise<string> {
+    const tasks = await this.getTaskItems();
+    if (format === 'json') {
+      return JSON.stringify(tasks, null, 2);
+    } else {
+      // Group by note title
+      const grouped: Record<string, any[]> = {};
+      tasks.forEach(t => {
+        if (!grouped[t.noteTitle]) grouped[t.noteTitle] = [];
+        grouped[t.noteTitle].push(t);
+      });
+
+      let md = '# Global Tasks Export\n\n';
+      Object.entries(grouped).forEach(([title, items]) => {
+        md += `## ${title}\n`;
+        items.forEach(item => {
+          md += `- [${item.completed ? 'x' : ' '}] ${item.text}\n`;
+        });
+        md += '\n';
+      });
+      return md;
+    }
+  },
+
+  saveAppLockSettings(enabled: boolean, passwordHash: string, timeoutMinutes: number) {
+    localStorage.setItem('linknote-applock-enabled', JSON.stringify(enabled));
+    localStorage.setItem('linknote-applock-password-hash', passwordHash);
+    localStorage.setItem('linknote-applock-timeout', String(timeoutMinutes));
+  },
+
+  async verifyAppLockPassword(password: string): Promise<boolean> {
+    const savedHash = localStorage.getItem('linknote-applock-password-hash');
+    if (!savedHash) return true;
+
+    // Calculate sha256 of input
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    return calculatedHash === savedHash;
   },
 };

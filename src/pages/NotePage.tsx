@@ -17,6 +17,8 @@ import { useToast } from '../hooks/useToast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { VersionHistoryPanel } from '../components/VersionHistoryPanel';
 import { QRShareModal } from '../components/QRShareModal';
+import { extractWikiLinks } from '../utils/wikiLinkParser';
+import { useTranslation } from '../i18n/i18n';
 import { Lock, Unlock, Copy, Share2, Sparkles, X, Download, ShieldCheck, AlertCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -29,10 +31,15 @@ export function NotePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'saving' | 'saved' | 'error' | 'idle'>('idle');
+
+  // Wiki links tracking states
+  const [backlinks, setBacklinks] = useState<Note[]>([]);
+  const [outgoingLinks, setOutgoingLinks] = useState<string[]>([]);
 
   // Encryption session state
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -178,6 +185,23 @@ export function NotePage() {
   useEffect(() => {
     loadNote();
   }, [loadNote]);
+
+  // Dynamically analyze bi-directional wiki-connections inside notes
+  useEffect(() => {
+    async function loadLinks() {
+      if (!note) return;
+      try {
+        const bl = await noteStorage.getBacklinks(note.title);
+        setBacklinks(bl);
+
+        const ol = extractWikiLinks(decryptedText);
+        setOutgoingLinks(ol);
+      } catch (err) {
+        console.error('Failed to calculate wiki-link networks', err);
+      }
+    }
+    loadLinks();
+  }, [note?.title, decryptedText]);
 
   // Handle unlocks
   const handleUnlockSubmit = async (password: string) => {
@@ -388,6 +412,132 @@ export function NotePage() {
     }
   };
 
+  const handleExportHtml = () => {
+    if (!note) return;
+    try {
+      const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${note.title || 'Untitled Note'}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #334155;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background-color: #f8fafc;
+    }
+    h1 {
+      font-size: 2.25rem;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    pre {
+      background-color: #1e293b;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+    }
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.875rem;
+      background-color: #f1f5f9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+    }
+    pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    blockquote {
+      border-left: 4px solid #6366f1;
+      padding-left: 1rem;
+      color: #64748b;
+      font-style: italic;
+      margin: 1.5rem 0;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #0f172a;
+        color: #cbd5e1;
+      }
+      h1 {
+        color: #f8fafc;
+        border-bottom-color: #1e293b;
+      }
+      code {
+        background-color: #1e293b;
+        color: #f8fafc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>${note.title || 'Untitled Note'}</h1>
+  <div>${decryptedText.replace(/\n/g, '<br>')}</div>
+</body>
+</html>
+      `;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${note.title || 'untitled'}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast('HTML document downloaded', 'success');
+    } catch (err) {
+      toast('Failed to export HTML', 'error');
+    }
+  };
+
+  const handleExportDoc = () => {
+    if (!note) return;
+    try {
+      const docContent = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><title>${note.title}</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.5; }
+  h1 { font-size: 24pt; border-bottom: 1px solid #ccc; padding-bottom: 6pt; }
+</style>
+</head>
+<body>
+<h1>${note.title}</h1>
+<p>${decryptedText.replace(/\n/g, '<br>')}</p>
+</body>
+</html>
+      `;
+      const blob = new Blob(['\ufeff' + docContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${note.title || 'untitled'}.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast('Word Document downloaded', 'success');
+    } catch (err) {
+      toast('Failed to export Word Document', 'error');
+    }
+  };
+
+  const handlePresent = () => {
+    if (!note) return;
+    navigate(`/present/${note.id}`);
+  };
+
   // IMPORTS
   const handleImportFile = (file: File) => {
     const reader = new FileReader();
@@ -494,10 +644,13 @@ export function NotePage() {
             onCodeLanguageChange={handleCodeLanguageChange}
             onExportMarkdown={handleExportMarkdown}
             onExportTxt={handleExportTxt}
+            onExportHtml={handleExportHtml}
+            onExportDoc={handleExportDoc}
             onImportFile={handleImportFile}
             onCopyLocalLink={handleCopyLocalLink}
             onGenerateShareLink={handleGenerateShareLink}
             onPrint={handlePrint}
+            onPresent={handlePresent}
             onCreateNewNote={onCreateNewNote}
             isAiOpen={isAiOpen}
             setIsAiOpen={setIsAiOpen}
@@ -553,6 +706,64 @@ export function NotePage() {
                 onSelectionChange={setSelectedText}
                 externalContentUpdate={externalContentUpdate}
               />
+
+              {/* Backlinks & Outgoing connections panel (only visible if not in Focus Mode) */}
+              {!isFocusMode && (
+                <div id="wiki-connections-panel" className="mt-4 shrink-0 bg-white/60 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/10 rounded-2xl p-4 space-y-3 shadow-xs select-none">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block">
+                      Wiki-Connection Network
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Backlinks */}
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
+                        {t('backlinks')} ({backlinks.length})
+                      </span>
+                      {backlinks.length === 0 ? (
+                        <span className="text-xs text-slate-400 dark:text-slate-500 block italic">No incoming backlinks</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {backlinks.map(bl => (
+                            <button
+                              id={`backlink-note-${bl.id}`}
+                              key={bl.id}
+                              onClick={() => navigate(`/note/${bl.id}`)}
+                              className="text-xs font-semibold px-2.5 py-1 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5 rounded-lg cursor-pointer transition-colors"
+                            >
+                              {bl.title}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Outgoing Links */}
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
+                        {t('outgoingLinks')} ({outgoingLinks.length})
+                      </span>
+                      {outgoingLinks.length === 0 ? (
+                        <span className="text-xs text-slate-400 dark:text-slate-500 block italic">No outgoing wiki-links parsed</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {outgoingLinks.map((title, idx) => (
+                            <button
+                              id={`outgoing-link-${idx}`}
+                              key={idx}
+                              onClick={() => navigate(`/note-title/${encodeURIComponent(title)}`)}
+                              className="text-xs font-semibold px-2.5 py-1 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/15 rounded-lg cursor-pointer transition-colors"
+                            >
+                              [[{title}]]
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {isHistoryOpen && (

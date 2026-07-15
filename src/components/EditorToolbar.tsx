@@ -47,10 +47,13 @@ interface EditorToolbarProps {
   onCodeLanguageChange: (lang: string) => void;
   onExportMarkdown: () => void;
   onExportTxt: () => void;
+  onExportHtml: () => void;
+  onExportDoc: () => void;
   onImportFile: (file: File) => void;
   onCopyLocalLink: () => void;
   onGenerateShareLink: () => void;
   onPrint: () => void;
+  onPresent: () => void;
   onCreateNewNote: () => void;
   isAiOpen: boolean;
   setIsAiOpen: (open: boolean) => void;
@@ -84,10 +87,13 @@ export function EditorToolbar({
   onCodeLanguageChange,
   onExportMarkdown,
   onExportTxt,
+  onExportHtml,
+  onExportDoc,
   onImportFile,
   onCopyLocalLink,
   onGenerateShareLink,
   onPrint,
+  onPresent,
   onCreateNewNote,
   isAiOpen,
   setIsAiOpen,
@@ -264,6 +270,16 @@ export function EditorToolbar({
             <span>Focus Mode</span>
           </button>
 
+          {/* Presentation Mode */}
+          <button
+            onClick={onPresent}
+            className="px-3 py-1.5 text-xs font-semibold rounded-xl border bg-white/40 dark:bg-white/5 border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/10 flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Launch Presentation Mode"
+          >
+            <Monitor className="h-3.5 w-3.5 text-indigo-500" />
+            <span>Presentation</span>
+          </button>
+
           {/* Version history toggle */}
           {onToggleHistory && (
             <button
@@ -382,6 +398,26 @@ export function EditorToolbar({
                 >
                   <FileText className="h-4 w-4 text-emerald-500" />
                   Download Plain Text (.txt)
+                </button>
+                <button
+                  onClick={() => {
+                    setIsActionsDropdownOpen(false);
+                    onExportHtml();
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-white/10 rounded-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <FileDown className="h-4 w-4 text-blue-500" />
+                  Download HTML (.html)
+                </button>
+                <button
+                  onClick={() => {
+                    setIsActionsDropdownOpen(false);
+                    onExportDoc();
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-white/10 rounded-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <FileDown className="h-4 w-4 text-sky-500" />
+                  Download Word (.doc)
                 </button>
                 <button
                   onClick={() => {

@@ -21,6 +21,14 @@ export interface Note {
   folder?: string;
   isDeleted?: boolean;
   deletedAt?: string;
+  type?: 'note' | 'daily';
+  dailyDate?: string;
+  linkedNoteTitles?: string[];
+  taskStats?: {
+    total: number;
+    completed: number;
+    pending: number;
+  };
 }
 
 export interface NoteVersion {

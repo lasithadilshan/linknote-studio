@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Note, EditorMode } from '../types';
+import { noteStorage } from '../services/noteStorage';
 import { calculateStats } from '../utils/textStats';
 import { formatDateFull } from '../utils/dateUtils';
 import { MarkdownPreview } from './MarkdownPreview';
@@ -41,6 +42,12 @@ export function NoteEditor({
   const [selectionStart, setSelectionStart] = useState(0);
   const [selectionEnd, setSelectionEnd] = useState(0);
 
+  // Wiki links autocomplete states
+  const [allNoteTitles, setAllNoteTitles] = useState<string[]>([]);
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [suggestQuery, setSuggestQuery] = useState('');
+  const [suggestIndex, setSuggestIndex] = useState(0);
+
   // Sync state if loading a different note
   useEffect(() => {
     setLocalTitle(note.title);
@@ -49,10 +56,48 @@ export function NoteEditor({
     setNewTagText('');
     setSelectionStart(0);
     setSelectionEnd(0);
+    setShowSuggest(false);
     if (onSelectionChange) {
       onSelectionChange('');
     }
   }, [note.id]);
+
+  // Load all note titles for autocompletion
+  useEffect(() => {
+    async function loadTitles() {
+      try {
+        const notes = await noteStorage.getAllNotes();
+        setAllNoteTitles(notes.map(n => n.title));
+      } catch (err) {
+        console.error('Failed to load note titles for wiki-link autocompletion', err);
+      }
+    }
+    loadTitles();
+  }, [note.id]);
+
+  const filteredSuggestions = allNoteTitles.filter(title =>
+    title.toLowerCase().includes(suggestQuery.toLowerCase()) && title !== note.title
+  );
+
+  const handleSelectSuggestion = (selectedTitle: string) => {
+    const textBeforeBracket = localContent.substring(0, localContent.substring(0, selectionStart).lastIndexOf('[[')) + '[[';
+    const textAfterCursor = localContent.substring(selectionStart);
+    const completedLink = textBeforeBracket + selectedTitle + ']]' + textAfterCursor;
+
+    setLocalContent(completedLink);
+    onNoteChange({ content: completedLink });
+    setShowSuggest(false);
+
+    // Refocus and place cursor after the closed brackets
+    setTimeout(() => {
+      const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+        const newCursorPos = textBeforeBracket.length + selectedTitle.length + 2;
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 50);
+  };
 
   // Handle incoming AI changes (replace, insert, append)
   useEffect(() => {
@@ -115,6 +160,23 @@ export function NoteEditor({
   const handleRemoveTag = (tagToRemove: string) => {
     const updatedTags = localTags.filter((t) => t !== tagToRemove);
     setLocalTags(updatedTags);
+  };
+
+  const handleContentChange = (val: string, cursor: number) => {
+    setLocalContent(val);
+
+    // Check if we are typing a wiki link
+    const textBeforeCursor = val.substring(0, cursor);
+    const lastOpenBracket = textBeforeCursor.lastIndexOf('[[');
+
+    if (lastOpenBracket !== -1 && lastOpenBracket >= textBeforeCursor.lastIndexOf(']]')) {
+      const query = textBeforeCursor.substring(lastOpenBracket + 2);
+      setSuggestQuery(query);
+      setShowSuggest(true);
+      setSuggestIndex(0);
+    } else {
+      setShowSuggest(false);
+    }
   };
 
   // Compute stats on the current editor typing state in real-time
@@ -199,21 +261,39 @@ export function NoteEditor({
         
         {/* Editor Area (Visible in 'edit' or 'split') */}
         {(editorMode === 'edit' || editorMode === 'split') && (
-          <div className="flex-1 flex flex-col h-full bg-transparent min-w-0">
+          <div className="flex-1 flex flex-col h-full bg-transparent min-w-0 relative">
             {isFocusMode && (
               <div className="px-6 pt-5 pb-2 text-center text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest border-b border-slate-100 dark:border-slate-850">
                 — Focus Mode Active —
               </div>
             )}
-            
+
             <textarea
+              id="note-textarea"
               value={localContent}
               onChange={(e) => {
-                setLocalContent(e.target.value);
+                handleContentChange(e.target.value, e.target.selectionStart);
                 setSelectionStart(e.target.selectionStart);
                 setSelectionEnd(e.target.selectionEnd);
                 if (onSelectionChange) {
                   onSelectionChange('');
+                }
+              }}
+              onKeyDown={(e) => {
+                if (showSuggest && filteredSuggestions.length > 0) {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSuggestIndex(prev => (prev + 1) % filteredSuggestions.length);
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSuggestIndex(prev => (prev - 1 + filteredSuggestions.length) % filteredSuggestions.length);
+                  } else if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    handleSelectSuggestion(filteredSuggestions[suggestIndex]);
+                  } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setShowSuggest(false);
+                  }
                 }
               }}
               onSelect={(e) => {
@@ -248,6 +328,31 @@ export function NoteEditor({
                 note.isCode ? 'font-mono text-sm' : 'font-sans text-base'
               } ${isFocusMode ? 'max-w-3xl mx-auto text-lg' : ''}`}
             />
+
+            {/* Wiki-links autocomplete suggestion box */}
+            {showSuggest && filteredSuggestions.length > 0 && (
+              <div className="absolute left-6 bottom-16 max-w-[320px] w-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800 backdrop-blur-md">
+                <div className="px-3 py-1.5 text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest select-none bg-slate-50/50 dark:bg-slate-950/45">
+                  Wiki-Link Suggestions (Enter/Tab)
+                </div>
+                <div className="max-h-48 overflow-y-auto p-1 space-y-0.5">
+                  {filteredSuggestions.map((title, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSelectSuggestion(title)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between cursor-pointer transition-colors ${
+                        idx === suggestIndex
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100/50 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="truncate mr-2">{title}</span>
+                      <span className="text-[10px] opacity-60 font-mono shrink-0">[[...]]</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
