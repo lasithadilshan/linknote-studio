@@ -226,9 +226,9 @@ export function DashboardPage() {
         />
 
         {/* Main Body Grid with Left Sidebar on Desktop */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)] items-start">
           {/* A. Responsive Sidebar Panel */}
-          <aside className="w-full lg:w-64 shrink-0 flex flex-col gap-6">
+          <aside className="min-w-0 flex flex-col gap-6 w-full">
             
             {/* Desktop-only Navigation Folder lists */}
             <div className="hidden lg:block bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 rounded-2xl p-4 shadow-xs">
@@ -414,7 +414,7 @@ export function DashboardPage() {
               /* Interactive responsive Grid */
               <motion.div
                 layout
-                className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 w-full"
+                className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 w-full"
               >
                 <AnimatePresence>
                   {filteredNotes.map((note) => (

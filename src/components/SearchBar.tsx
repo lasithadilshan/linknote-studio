@@ -32,7 +32,7 @@ export function SearchBar({
   return (
     <div id="dashboard-search-bar" className="space-y-5">
       {/* Search Input and Filters Subgrid */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] items-stretch">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto_auto] items-stretch">
         {/* Search Input Box */}
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500 pointer-events-none" />
@@ -89,7 +89,7 @@ export function SearchBar({
 
       {/* Tags Quick Filter horizontal scrolling list */}
       {allTags.length > 0 && (
-        <div className="flex items-center gap-2.5 overflow-x-auto py-2 scrollbar-none select-none">
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-2 scrollbar-thin select-none">
           <span className="text-xs font-bold text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1.5 uppercase tracking-wider">
             <Tag className="h-3.5 w-3.5" />
             Tags:

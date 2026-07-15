@@ -33,7 +33,7 @@ export function NoteCard({
   return (
     <div
       id={`note-card-${note.id}`}
-      className={`group relative flex min-h-[240px] flex-col rounded-3xl border transition-all duration-200 hover:-translate-y-0.5 flex-1 min-w-[280px] ${
+      className={`group relative flex min-h-[240px] w-full min-w-0 flex-col rounded-3xl border transition-all duration-200 hover:-translate-y-0.5 ${
         note.isFavorite
           ? 'bg-amber-50/20 border-amber-200/80 dark:bg-amber-500/[0.02] dark:border-amber-500/30 hover:border-amber-400 dark:hover:border-amber-500/60 hover:shadow-lg hover:shadow-amber-500/5 dark:hover:shadow-none'
           : 'bg-white border-slate-200 dark:border-slate-800 dark:bg-slate-900 shadow-sm dark:shadow-none hover:border-indigo-300 dark:hover:border-indigo-500/60 hover:shadow-lg hover:shadow-indigo-500/5'
@@ -83,27 +83,27 @@ export function NoteCard({
       </div>
 
       {/* Clickable Area for Card Title and Preview */}
-      <div className="flex-1 flex flex-col px-5 pt-3">
+      <div className="flex-1 flex flex-col px-5 pt-3 min-w-0">
         {!isTrashView ? (
-          <Link to={`/note/${note.id}`} className="block focus:outline-none mb-2">
-            <h3 className="text-lg font-semibold text-slate-950 dark:text-slate-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 font-display pr-4">
+          <Link to={`/note/${note.id}`} className="block focus:outline-none mb-2 min-w-0">
+            <h3 className="text-lg font-semibold text-slate-950 dark:text-slate-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate font-display pr-4">
               {note.title || 'Untitled Note'}
             </h3>
           </Link>
         ) : (
-          <div className="block mb-2">
-            <h3 className="text-lg font-semibold text-slate-500 dark:text-slate-400 line-clamp-1 font-display pr-4">
+          <div className="block mb-2 min-w-0">
+            <h3 className="text-lg font-semibold text-slate-500 dark:text-slate-400 truncate font-display pr-4">
               {note.title || 'Untitled Note'}
             </h3>
           </div>
         )}
 
         {/* Note content summary preview */}
-        <div className="flex-1 min-h-[50px] mb-4">
+        <div className="flex-1 min-h-[50px] mb-4 min-w-0">
           {note.isEncrypted ? (
-            <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-xs">
+            <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-xs min-w-0">
               <Lock className="h-4 w-4 shrink-0 text-amber-500" />
-              <span className="italic select-none">Encrypted content. Password required to read.</span>
+              <span className="italic select-none truncate">Encrypted content. Password required to read.</span>
             </div>
           ) : (
             <p className="text-sm leading-6 text-slate-600 dark:text-slate-400 line-clamp-3 break-words font-sans">
@@ -118,18 +118,18 @@ export function NoteCard({
 
         {/* Tags section */}
         {note.tags && note.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
+          <div className="flex flex-wrap gap-1 mb-4 min-w-0 overflow-hidden">
             {note.tags.slice(0, 3).map((tag, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg max-w-full truncate"
               >
-                <Tag className="h-2.5 w-2.5 text-slate-400 dark:text-slate-500" />
-                {tag}
+                <Tag className="h-2.5 w-2.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                <span className="truncate">{tag}</span>
               </span>
             ))}
             {note.tags.length > 3 && (
-              <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 self-center">
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 self-center shrink-0">
                 +{note.tags.length - 3} more
               </span>
             )}
@@ -138,10 +138,10 @@ export function NoteCard({
       </div>
 
       {/* Bottom info panel (Footer) */}
-      <div className="mt-auto border-t border-slate-100 dark:border-slate-800 px-5 py-4 flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium select-none">
+      <div className="mt-auto border-t border-slate-100 dark:border-slate-800 px-5 py-4 flex items-center justify-between gap-3 min-w-0">
+        <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium select-none shrink-0">
           <Calendar className="h-3.5 w-3.5 shrink-0" />
-          {formatDate(note.updatedAt)}
+          <span className="truncate">{formatDate(note.updatedAt)}</span>
         </span>
 
         {isTrashView && onRestore ? (
@@ -163,7 +163,7 @@ export function NoteCard({
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             {!note.isEncrypted && (
               <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-1 bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 rounded-md mr-1.5 select-none">
                 {stats.words} W
